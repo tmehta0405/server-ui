@@ -7,7 +7,13 @@
 <div class='center'>
     <h1>Dashboard</h1>
 </div>
-{%for field in ssh_info%}
-    {{field}}
-{%endfor%}
+{% if ssh_info %}
+    <div class="ssh-info">
+        <p>Hostname: {{ ssh_info.hostname }}</p>
+        <p>Username: {{ ssh_info.username }}</p>
+        <p>Port: {{ ssh_info.port }}</p>
+    </div>
+{% else %}
+    <p>No SSH connection information available.</p>
+{% endif %}
 {%endblock%}

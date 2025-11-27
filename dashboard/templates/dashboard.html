@@ -7,12 +7,7 @@
 <div class='center'>
     <h1>Dashboard</h1>
 </div>
-<div class='interface'>
-    <div class='navbar'>
-
-    </div>
-    <div class='content'>
-        
-    </div>
-</div>
+{%for field in ssh_info%}
+    {{field}}
+{%endfor%}
 {%endblock%}

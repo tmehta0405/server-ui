@@ -1,0 +1,24 @@
+{%extends 'template.html'%}
+{%block title%}Enter Info{%endblock%}
+{%load static%}
+{%load widget_tweaks%}
+{%block css%}<link rel="stylesheet" href="{%static 'css/ssh.css'%}">{%endblock%}
+{%block script%}<script src="{%static 'js/ssh.js'%}"></script>{%endblock%}
+{%block content%}
+<div class='center'>
+    <h1>SSH Information</h1>
+    <form method='POST'>
+        {%csrf_token%}
+        {%for field in form%}
+            <div class='form-group'>
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% render_field field class="form-control" %}
+                {% if field.errors %}
+                    <div class="field-errors">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type='submit'>Submit</button>
+    </form>
+</div>
+{%endblock%}

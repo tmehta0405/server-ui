@@ -1,1 +1,18 @@
-hello
+{%extends 'template.html'%}
+{%load static%}
+{%block title%}Dashboard{%endblock%}
+{%block css%}<link rel="stylesheet" href="{%static 'css/dashboard.css'%}">{%endblock%}
+{%block script%}<script src="{%static 'js/dashboard.js'%}"></script>{%endblock%}
+{%block content%}
+<div class='center'>
+    <h1>Dashboard</h1>
+</div>
+<div class='interface'>
+    <div class='navbar'>
+
+    </div>
+    <div class='content'>
+        
+    </div>
+</div>
+{%endblock%}

@@ -42,7 +42,7 @@ htmlcov/
 *.sqlite3
 db.sqlite3
 media/
-staticfiles/
+staticfiles/admin
 static/
 media_root/
 *.pem
@@ -52,3 +52,4 @@ yarn-error.log*
 node_modules/
 .DS_Store
 Thumbs.db
+

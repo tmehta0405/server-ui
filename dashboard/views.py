@@ -24,7 +24,7 @@ def ssh(request):
                     'username': username,
                     'port': port,
                 }
-                request.session['ssh_info'] = ssh_info
+                request.session['ssh_info'] = ssh_info #stores the ssh info for the dashboard 
                 return redirect('dashboard')
             except AuthenticationException:
                 form.add_error(None, 'Authentication failed. Check username/password.')

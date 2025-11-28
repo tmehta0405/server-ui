@@ -4,7 +4,6 @@ import paramiko
 from paramiko.ssh_exception import SSHException, AuthenticationException
 import socket
 
-
 def ssh(request):
     ssh_info = None
     if request.method == 'POST':
@@ -22,6 +21,7 @@ def ssh(request):
                 ssh_info = {
                     'hostname': hostname,
                     'username': username,
+                    'password': password,
                     'port': port,
                 }
                 request.session['ssh_info'] = ssh_info #stores the ssh info for the dashboard 
@@ -46,3 +46,4 @@ def dashboard(request):
         'ssh_info': request.session.pop('ssh_info', None)
     }
     return render(request, 'dashboard.html', context)
+

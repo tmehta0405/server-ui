@@ -8,12 +8,25 @@
     <h1>Dashboard</h1>
 </div>
 {% if ssh_info %}
+    <script>
+        window.sshInfo = {
+            host: '{{ ssh_info.hostname }}',
+            user: '{{ ssh_info.username }}',
+            password: '{{ ssh_info.password }}',
+            port: {{ ssh_info.port }}
+        };
+    </script>
     <div class="ssh-info">
-        <p>Hostname: {{ ssh_info.hostname }}</p>
-        <p>Username: {{ ssh_info.username }}</p>
-        <p>Port: {{ ssh_info.port }}</p>
+        <h2>Server Info</h2>
+        <p><strong>Hostname:</strong> {{ ssh_info.hostname }}</p>
+        <p><strong>Username:</strong> {{ ssh_info.username }}</p>
+        <p><strong>Port:</strong> {{ ssh_info.port }}</p>
+    </div>
+    <div class='server-info'>
+        <h2>Metrics</h2>
+        <p id='cpu'>CPU: Loading...</p>
     </div>
 {% else %}
-    <p>No SSH connection information available.</p>
+    <p>No SSH connection info. <a href="/">Go back</a></p>
 {% endif %}
 {%endblock%}

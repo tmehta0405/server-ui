@@ -50,17 +50,28 @@ class Consumer(AsyncWebsocketConsumer):
                         output_raw = result.stdout
                         output = output_raw.decode('utf-8') if isinstance(output_raw, bytes) else str(output_raw)
                         print(f"Command output: {output}")
-                        
-                        if output:
-                            lines = output.strip().split('\n')
-                            print(lines)
-                        else:
-                            data = {}
+                        data = {}
+                        lines = output.strip().split('\n')
+
+                        for i, line in enumerate(lines):
+                            if line.startswith('CPU:'):
+                                data['cpu'] = line.split('CPU: ')[1].strip()
+                            elif line.startswith('RAM:'):
+                                data['ram'] = line.split('RAM: ')[1].strip()
+                            elif line.startswith('DISK:'):
+                                disk_lines = []
+                                for disk_line in lines[i+1:]:  
+                                    if disk_line.strip():
+                                        disk_lines.append(disk_line.strip())
+                                data['disk'] = disk_lines
+                                break
                         
                         print(f"Sending Data: {data}")
                         await self.send(text_data=json.dumps({
-                            'status': 'success',
-                            'data': data
+                            'status': 'success', #data.status in js 
+                            'cpu': data.get('cpu', 'N/A'),
+                            'ram': data.get('ram', 'N/A'),
+                            'disk': data.get('disk', []),
                         }))
                     except Exception as e:
                         print(f"Command error: {e}")

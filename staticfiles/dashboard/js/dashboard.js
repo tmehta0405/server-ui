@@ -1,13 +1,11 @@
 console.log('dashboard.js loaded');
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded fired');
-    
+document.addEventListener('DOMContentLoaded', function() {    
     const cpuDisplay = document.getElementById('cpu');
-    console.log('cpuDisplay element:', cpuDisplay);
+    const ramDisplay = document.getElementById('ram');
+    const diskDisplay = document.getElementById('disk');
     
-    if (!cpuDisplay) {
-        console.log('CPU display element not found, exiting');
+    if (!cpuDisplay || !ramDisplay || !diskDisplay) {
         return;
     }
 
@@ -15,7 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('sshInfo:', sshInfo);
     
     if (!sshInfo) {
-        cpuDisplay.textContent = 'CPU: No SSH info';
+        cpuDisplay.textContent = 'No SSH info';
+        ramDisplay.textContent = 'No SSH info';
+        diskDisplay.textContent = 'No SSH info';
         return;
     }
 
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const socket = new WebSocket(wsUrl);
 
     socket.onopen = function() {
-        console.log('✓ WebSocket connected');
+        console.log('WebSocket connected'); //sends da ssh info to consumers.py
         const msg = {
             action: 'start',
             ssh_data: sshInfo
@@ -37,23 +37,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        console.log('✓ Received:', data);
+        console.log('Received:', data); //gets da system info from consumers.py
         
         if (data.status === 'error') {
-            cpuDisplay.textContent = 'CPU: Error - ' + data.message;
-        } else if (data.cpu) {
+            cpuDisplay.textContent = 'Error - ' + data.message;
+            ramDisplay.textContent = 'Error - ' + data.message;
+            diskDisplay.textContent = 'Error - ' + data.message;
+        } else {
             cpuDisplay.textContent = 'CPU: ' + data.cpu;
+            ramDisplay.textContent = 'RAM: ' + data.ram;
+            diskDisplay.textContent = 'Disk: ' + data.disk;
         }
     };
 
     socket.onerror = function(error) {
-        console.error('✗ WebSocket error:', error);
+        console.error('WebSocket error:', error);
         cpuDisplay.textContent = 'CPU: WebSocket error';
+        ramDisplay.textContent = 'RAM: WebSocket error';
+        diskDisplay.textContent = 'Disk: WebSocket error';
     };
 
     socket.onclose = function() {
-        console.log('✗ WebSocket disconnected');
+        console.log('WebSocket disconnected');
         cpuDisplay.textContent = 'CPU: Disconnected';
+        ramDisplay.textContent = 'RAM: Disconnected';
+        diskDisplay.textContent = 'Disk: Disconnected';
     };
 });
 

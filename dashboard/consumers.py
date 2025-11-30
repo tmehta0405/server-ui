@@ -38,26 +38,29 @@ class Consumer(AsyncWebsocketConsumer):
                 print("SSH connected")
                 while True:  
                     try:
-                        result = await conn.run("top -bn1 | grep 'Cpu(s)'", timeout=5)
+                        result = await conn.run(
+                            r"""
+                            echo "CPU: $(top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\([0-9.]*\)%* id.*/\1/' | awk '{print 100 - $1"%"}')" \
+                            && echo "RAM: $(free -m | awk '/Mem:/ {print $3"MB / "$2"MB"}')" \
+                            && echo "DISK:" \
+                            && df -h --output=target,used,size
+                            """, #cpu ram and disk cmd
+                            timeout=5
+                        )
                         output_raw = result.stdout
                         output = output_raw.decode('utf-8') if isinstance(output_raw, bytes) else str(output_raw)
                         print(f"Command output: {output}")
                         
                         if output:
-                            match = re.search(r'(\d+\.?\d*)\s*id', output)  # type: ignore
-                            if match:
-                                idle = float(match.group(1))
-                                cpu_usage = round(100 - idle, 1)
-                                cpu_str = f'{cpu_usage}%'
-                            else:
-                                cpu_str = 'N/A'
+                            lines = output.strip().split('\n')
+                            print(lines)
                         else:
-                            cpu_str = 'N/A'
+                            data = {}
                         
-                        print(f"Sending CPU: {cpu_str}")
+                        print(f"Sending Data: {data}")
                         await self.send(text_data=json.dumps({
                             'status': 'success',
-                            'cpu': cpu_str
+                            'data': data
                         }))
                     except Exception as e:
                         print(f"Command error: {e}")

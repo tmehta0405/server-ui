@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             cpuDisplay.textContent = 'CPU: ' + data.cpu;
             ramDisplay.textContent = 'RAM: ' + data.ram;
-            diskDisplay.textContent = 'Disk: ' + data.disk;
+            diskDisplay.textContent = 'DISK: ' + data.disk;
         }
     };
 
@@ -54,14 +54,14 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('WebSocket error:', error);
         cpuDisplay.textContent = 'CPU: WebSocket error';
         ramDisplay.textContent = 'RAM: WebSocket error';
-        diskDisplay.textContent = 'Disk: WebSocket error';
+        diskDisplay.textContent = 'DISK: WebSocket error';
     };
 
     socket.onclose = function() {
         console.log('WebSocket disconnected');
         cpuDisplay.textContent = 'CPU: Disconnected';
         ramDisplay.textContent = 'RAM: Disconnected';
-        diskDisplay.textContent = 'Disk: Disconnected';
+        diskDisplay.textContent = 'DISK: Disconnected';
     };
 });
 

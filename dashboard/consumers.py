@@ -24,6 +24,20 @@ class Consumer(AsyncWebsocketConsumer):
             print(f"Receive error: {e}")
             await self.send(text_data=json.dumps({'status': 'error', 'message': str(e)}))
 
+    async def files(self, ssh_data):
+        try:
+            async with asyncssh.connect(
+                ssh_data.get('host'),
+                port=int(ssh_data.get('port', 22)),
+                username=ssh_data.get('user'),
+                password=ssh_data.get('password'),
+                known_hosts=None,
+                connect_timeout=10
+            )
+
+        except Exception as e:
+            print(f"Error: {e}")
+            break
     async def monitor(self, ssh_data):
         try:
             print(f"Connecting to {ssh_data.get('host')}:{ssh_data.get('port')}")
@@ -69,7 +83,7 @@ class Consumer(AsyncWebsocketConsumer):
                             'status': 'success', #data.status in js 
                             'cpu': data.get('cpu', 'N/A'),
                             'ram': data.get('ram', 'N/A'),
-                            'disk': data.get('disk', []),
+                            'disk': data.get('disk', 'N/A'),
                         }))
                     except Exception as e:
                         print(f"Command error: {e}")

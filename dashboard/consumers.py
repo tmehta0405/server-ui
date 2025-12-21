@@ -59,11 +59,9 @@ class Consumer(AsyncWebsocketConsumer):
                             elif line.startswith('RAM:'):
                                 data['ram'] = line.split('RAM: ')[1].strip()
                             elif line.startswith('DISK:'):
-                                disk_lines = []
                                 for disk_line in lines[i+1:]:  
-                                    if disk_line.strip():
-                                        disk_lines.append(disk_line.strip())
-                                data['disk'] = disk_lines
+                                    if disk_line.strip()[:2] == '/ ':
+                                        data['disk'] = disk_line.strip()
                                 break
                         
                         print(f"Sending Data: {data}")

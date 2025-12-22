@@ -1,9 +1,15 @@
-{%extends 'template.html'%}
-{%load static%}
-{%block title%}Dashboard{%endblock%}
-{%block css%}<link rel="stylesheet" href="{%static 'dashboard/css/dashboard.css'%}">{%endblock%}
-{%block script%}<script src="{%static 'dashboard/js/dashboard.js'%}"></script>{%endblock%}
-{%block content%}
+{% extends 'template.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'dashboard/css/filebrowser.css' %}">
+{% endblock %}
+{% block script %}
+<script src="{% static 'dashboard/js/dashboard.js' %}"></script>
+<script src="{% static 'dashboard/js/filebrowser.js' %}"></script>
+{% endblock %}
+{% block content %}
 <div class='center'>
     <h1>Dashboard</h1>
 </div>
@@ -23,18 +29,16 @@
         <p><strong>Port:</strong> {{ ssh_info.port }}</p>
     </div>
     <div class='server-info'>
-        <h2>Metrics</h2>
+        <h2>System Metrics</h2>
         <p id='cpu'>CPU: Loading...</p>
         <p id='ram'>RAM: Loading...</p>
         <p id='disk'>DISK: Loading...</p>
     </div>
     <div class='file-directory'>
         <h2>File Directory</h2>
-        <div id='file-display'>
-            
-        </div>
+        <div id='file-display'></div>
     </div>
 {% else %}
     <p>No SSH connection info. <a href="/">Go back</a></p>
 {% endif %}
-{%endblock%}
+{% endblock %}

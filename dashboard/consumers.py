@@ -33,11 +33,24 @@ class Consumer(AsyncWebsocketConsumer):
                 password=ssh_data.get('password'),
                 known_hosts=None,
                 connect_timeout=10
-            )
-
+            ) as conn:
+                print("SSH connected")
+                while True:
+                    try:
+                        result = await conn.run('ls -l', timeout=5)
+                        output = result.stdout.strip()
+                        files = re.findall(r'^-.*\s+(\S+)$', output, re.MULTILINE)
+                        print(f"Files: {files}")
+                        await self.send(text_data=json.dumps({'status': 'success', 'files': files}))
+                    except Exception as e:
+                        print(f"Command error: {e}")
+                        await self.send(text_data=json.dumps({'status': 'error', 'message': str(e)}))
+                        break
+                    
+                    await asyncio.sleep(1)
         except Exception as e:
             print(f"Error: {e}")
-            break
+            await self.send(text_data=json.dumps({'status': 'error', 'message': f"SSH error: {str(e)}"}))
     async def monitor(self, ssh_data):
         try:
             print(f"Connecting to {ssh_data.get('host')}:{ssh_data.get('port')}")

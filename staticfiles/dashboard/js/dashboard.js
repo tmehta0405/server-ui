@@ -1,5 +1,3 @@
-console.log('dashboard.js loaded');
-
 document.addEventListener('DOMContentLoaded', function() {    
     const cpuDisplay = document.getElementById('cpu');
     const ramDisplay = document.getElementById('ram');
@@ -26,27 +24,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const socket = new WebSocket(wsUrl);
 
     socket.onopen = function() {
-        console.log('WebSocket connected'); //sends da ssh info to consumers.py
+        console.log('WebSocket connected');
         const msg = {
             action: 'start',
             ssh_data: sshInfo
         };
+
         console.log('Sending:', msg);
         socket.send(JSON.stringify(msg));
+        
+        setTimeout(() => {
+            const fileDisplay = document.getElementById('file-display');
+            if (fileDisplay && window.FileBrowser) {
+                window.fileBrowser = new FileBrowser('file-display', socket, sshInfo);
+            }
+        }, 500);
     };
 
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        console.log('Received:', data); //gets da system info from consumers.py
-        
-        if (data.status === 'error') {
-            cpuDisplay.textContent = 'Error - ' + data.message;
-            ramDisplay.textContent = 'Error - ' + data.message;
-            diskDisplay.textContent = 'Error - ' + data.message;
-        } else {
-            cpuDisplay.textContent = 'CPU: ' + data.cpu;
-            ramDisplay.textContent = 'RAM: ' + data.ram;
-            diskDisplay.textContent = 'DISK: ' + data.disk;
+        console.log('Received:', data);
+        if (!data.action && data.status) {
+            if (data.status === 'error') {
+                cpuDisplay.textContent = 'Error - ' + data.message;
+                ramDisplay.textContent = 'Error - ' + data.message;
+                diskDisplay.textContent = 'Error - ' + data.message;
+            } else {
+                cpuDisplay.textContent = 'CPU: ' + data.cpu;
+                ramDisplay.textContent = 'RAM: ' + data.ram;
+                diskDisplay.textContent = 'DISK: ' + data.disk;
+            }
         }
     };
 
@@ -64,5 +71,3 @@ document.addEventListener('DOMContentLoaded', function() {
         diskDisplay.textContent = 'DISK: Disconnected';
     };
 });
-
-

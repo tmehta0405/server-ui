@@ -89,6 +89,7 @@ class Consumer(AsyncWebsocketConsumer):
                                 for disk_line in lines[i+1:]:  
                                     if disk_line.strip()[:2] == '/ ':
                                         data['disk'] = disk_line.strip()
+                                        break
                                 break
                         
                         print(f"Sending Data: {data}")

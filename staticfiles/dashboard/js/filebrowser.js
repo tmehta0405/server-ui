@@ -13,23 +13,55 @@ class FileBrowser {
     }
 
     init() {
+        console.log('FileBrowser init started');
+        console.log('Container:', this.container);
+        console.log('Socket:', this.socket);
+        console.log('SSH Info:', this.sshInfo);
+        
+        if (!this.container) {
+            console.error('Container element not found!');
+            return;
+        }
+        
+        if (!this.socket) {
+            console.error('Socket not provided!');
+            return;
+        }
+        
+        // Listen for messages
         this.originalOnMessage = this.socket.onmessage;
         const self = this;
         
         this.socket.onmessage = function(event) {
+            console.log('Socket message received:', event.data);
             const data = JSON.parse(event.data);
             
+            // Handle file browser messages
             if (data.action) {
+                console.log('File browser action:', data.action);
                 self.handleMessage(data);
             } 
+            // Pass other messages to original handler
             else if (self.originalOnMessage) {
                 self.originalOnMessage(event);
             }
         };
         
+        // Create UI
         this.createUI();
+        console.log('UI created');
         
-        setTimeout(() => this.loadDirectory(this.currentPath), 1000);
+        // Load initial directory after socket is ready
+        if (this.socket.readyState === WebSocket.OPEN) {
+            console.log('Socket already open, loading directory immediately');
+            this.loadDirectory(this.currentPath);
+        } else {
+            console.log('Socket not ready, waiting...');
+            setTimeout(() => {
+                console.log('Attempting to load directory, socket state:', this.socket.readyState);
+                this.loadDirectory(this.currentPath);
+            }, 2000);
+        }
     }
 
     createUI() {
@@ -74,15 +106,18 @@ class FileBrowser {
     }
 
     attachEventListeners() {
+        // Toolbar buttons
         document.getElementById('btn-back').addEventListener('click', () => this.goBack());
         document.getElementById('btn-home').addEventListener('click', () => this.goHome());
         document.getElementById('btn-refresh').addEventListener('click', () => this.loadDirectory(this.currentPath));
         document.getElementById('btn-new-file').addEventListener('click', () => this.createNewFile());
         document.getElementById('btn-new-folder').addEventListener('click', () => this.createNewFolder());
         
+        // Editor buttons
         document.getElementById('btn-save').addEventListener('click', () => this.saveFile());
         document.getElementById('btn-close-editor').addEventListener('click', () => this.closeEditor());
         
+        // Context menu
         const contextMenu = document.getElementById('context-menu');
         document.addEventListener('click', (e) => {
             if (!contextMenu.contains(e.target)) {
@@ -101,11 +136,23 @@ class FileBrowser {
 
     loadDirectory(path) {
         console.log('Loading directory:', path);
-        this.socket.send(JSON.stringify({
+        console.log('Socket ready state:', this.socket.readyState);
+        console.log('SSH Info:', this.sshInfo);
+        
+        if (this.socket.readyState !== WebSocket.OPEN) {
+            console.error('Socket not open! State:', this.socket.readyState);
+            this.showError('WebSocket not connected');
+            return;
+        }
+        
+        const message = {
             action: 'list_directory',
             ssh_data: this.sshInfo,
             path: path
-        }));
+        };
+        
+        console.log('Sending message:', JSON.stringify(message));
+        this.socket.send(JSON.stringify(message));
     }
 
     handleMessage(data) {
@@ -175,7 +222,7 @@ class FileBrowser {
         fileList.innerHTML = '';
         
         if (items.length === 0) {
-            fileList.innerHTML = '<div class="empty-message">Empty directory</div>';
+            fileList.innerHTML = '<div class="empty-message">📭 Empty directory</div>';
             return;
         }
         
@@ -197,6 +244,7 @@ class FileBrowser {
                 <div class="file-permissions">${item.permissions}</div>
             `;
             
+            // Double click to open
             itemDiv.addEventListener('dblclick', () => {
                 if (item.type === 'directory') {
                     this.openDirectory(item.name);
@@ -205,12 +253,15 @@ class FileBrowser {
                 }
             });
             
+            // Single click to select
             itemDiv.addEventListener('click', (e) => {
+                // Remove selection from all items
                 document.querySelectorAll('.file-item').forEach(el => el.classList.remove('selected'));
                 itemDiv.classList.add('selected');
                 this.selectedItem = item;
             });
             
+            // Right click for context menu
             itemDiv.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 this.selectedItem = item;
@@ -228,7 +279,7 @@ class FileBrowser {
             return '📁';
         }
         
-        return ''; 
+        return ''; // No icon for files
     }
 
     formatSize(size) {
@@ -393,7 +444,7 @@ class FileBrowser {
         const fileList = document.getElementById('file-list');
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
-        errorDiv.textContent = 'Error: ' + message;
+        errorDiv.textContent = '❌ Error: ' + message;
         fileList.prepend(errorDiv);
         
         setTimeout(() => errorDiv.remove(), 5000);
@@ -403,7 +454,7 @@ class FileBrowser {
         const fileList = document.getElementById('file-list');
         const successDiv = document.createElement('div');
         successDiv.className = 'success-message';
-        successDiv.textContent = message;
+        successDiv.textContent = '✅ ' + message;
         fileList.prepend(successDiv);
         
         setTimeout(() => successDiv.remove(), 3000);

@@ -17,7 +17,7 @@ COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/pyth
 COPY --from=builder /usr/local/bin/ /usr/local/bin/ 
 WORKDIR /app
 COPY --chown=appuser:appuser . .
-RUN chmod +x start.sh
+RUN sed -i 's/\r$//' start.sh && chmod +x start.sh
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1 
 USER appuser

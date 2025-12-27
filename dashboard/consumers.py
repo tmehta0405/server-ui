@@ -191,7 +191,6 @@ class Consumer(AsyncWebsocketConsumer):
                 connect_timeout=10
             ) as conn:
                 await conn.run(f'mkdir -p {folderpath}', timeout=5)
-                
                 await self.send(text_data=json.dumps({
                     'action': 'folder_created',
                     'status': 'success',

@@ -6,6 +6,14 @@ body {
     color: #fafafa;
 }
 
+h1 {
+    font-weight: 500;
+}
+
+li::marker {
+    display: none !important;
+}
+
 .center {
     display: flex;
     align-items: center;

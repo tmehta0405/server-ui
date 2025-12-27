@@ -4,10 +4,11 @@ body {
     font-family: 'Fredoka';
     background-color: #0d1017;
     color: #fafafa;
+    font-weight: 400;
 }
 
 .h-align {
     display: flex;
-    gaP: 5px;
+    gap: 5px;
     flex-direction: row;
 }

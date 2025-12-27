@@ -113,7 +113,7 @@ class Consumer(AsyncWebsocketConsumer):
                 known_hosts=None,
                 connect_timeout=10
             ) as conn:
-                result = await conn.run(f'cat "{filepath}"', timeout=5)
+                result = await conn.run(f'cat {filepath}', timeout=5)
                 content = result.stdout
                 
                 await self.send(text_data=json.dumps({
@@ -140,7 +140,7 @@ class Consumer(AsyncWebsocketConsumer):
                 known_hosts=None,
                 connect_timeout=10
             ) as conn:
-                result = await conn.run(f'cat > "{filepath}"', input=content.encode(), timeout=5)
+                result = await conn.run(f'cat > {filepath}', input=content.encode(), timeout=5)
                 
                 await self.send(text_data=json.dumps({
                     'action': 'file_written',
@@ -165,7 +165,7 @@ class Consumer(AsyncWebsocketConsumer):
                 known_hosts=None,
                 connect_timeout=10
             ) as conn:
-                await conn.run(f'touch "{filepath}"', timeout=5)
+                await conn.run(f'touch {filepath}', timeout=5)
                 
                 await self.send(text_data=json.dumps({
                     'action': 'file_created',
@@ -190,7 +190,7 @@ class Consumer(AsyncWebsocketConsumer):
                 known_hosts=None,
                 connect_timeout=10
             ) as conn:
-                await conn.run(f'mkdir -p "{folderpath}"', timeout=5)
+                await conn.run(f'mkdir -p {folderpath}', timeout=5)
                 
                 await self.send(text_data=json.dumps({
                     'action': 'folder_created',
@@ -215,7 +215,7 @@ class Consumer(AsyncWebsocketConsumer):
                 known_hosts=None,
                 connect_timeout=10
             ) as conn:
-                await conn.run(f'rm -rf "{filepath}"', timeout=5)
+                await conn.run(f'rm -rf {filepath}', timeout=5)
                 
                 await self.send(text_data=json.dumps({
                     'action': 'file_deleted',
@@ -240,7 +240,7 @@ class Consumer(AsyncWebsocketConsumer):
                 known_hosts=None,
                 connect_timeout=10
             ) as conn:
-                await conn.run(f'mv "{old_path}" "{new_path}"', timeout=5)
+                await conn.run(f'mv {old_path} {new_path}', timeout=5)
                 
                 await self.send(text_data=json.dumps({
                     'action': 'item_renamed',

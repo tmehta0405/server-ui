@@ -2,7 +2,7 @@
 
 body {
     font-family: 'Fredoka';
-    background-color: #0d1017;
+    background-color: #001b39;
     color: #fafafa;
     font-weight: 400;
 }
@@ -34,4 +34,12 @@ h2 {
 
 .btn {
     border: none;
+    background: transparent;
+    color: #fafafa;
+}
+
+.upload-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }

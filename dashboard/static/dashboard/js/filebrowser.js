@@ -63,13 +63,16 @@ document.addEventListener('DOMContentLoaded', function() {
             this.container.innerHTML = `
                 <div class="file-browser">
                     <div class="file-browser-toolbar">
-                        <button id="btn-back" class="btn-icon btn" title="Back">Back</button>
-                        <button id="btn-home" class="btn-icon btn " title="Home">Home</button>
-                        <button id="btn-refresh" class="btn-icon btn" title="Refresh">Refresh</button>
-                        <div class="path-display" id="path-display">~</div>
-                        <button id="btn-new-file" class="btn-primary btn">+ File</button>
-                        <button id="btn-new-folder" class="btn-primary btn">+ Folder</button>
+                        <button id="btn-back" class="btn-icon btn" title="Back"><i class="fa-solid fa-caret-left"></i></button>
+                        <button id="btn-home" class="btn-icon btn " title="Home"><i class="fa-solid fa-house-user"></i></button>
+                        <button id="btn-refresh" class="btn-icon btn" title="Refresh"><i class="fa-solid fa-arrow-rotate-right"></i></button>
+                        <div class='upload-section'>
+                            <div class="path-display" id="path-display">~</div>
+                            <button id="btn-new-file" class="btn-primary btn"><i class="fa-solid fa-file-circle-plus"></i></button>
+                            <button id="btn-new-folder" class="btn-primary btn"><i class="fa-solid fa-folder-plus"></i></button>
+                        </div>
                     </div>
+
                     
                     <div class="file-list-container">
                         <div id="file-list" class="file-list">
@@ -89,10 +92,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     
                     <div id="context-menu" class="context-menu" style="display: none;">
-                        <div class="context-menu-item" data-action="open">Open</div>
-                        <div class="context-menu-item" data-action="edit">Edit</div>
-                        <div class="context-menu-item" data-action="rename">Rename</div>
-                        <div class="context-menu-item" data-action="delete">Delete</div>
+                        <div class="context-menu-item" data-action="open"><i class="fa-solid fa-folder-open"></i> Open</div>
+                        <div class="context-menu-item" data-action="edit"><i class="fa-solid fa-pen-to-square"></i> Edit</div>
+                        <div class="context-menu-item" data-action="rename"><i class="fa-solid fa-font"></i> Rename</div>
+                        <div class="context-menu-item" data-action="delete"><i class="fa-solid fa-trash-can"></i> Delete</div>
                     </div>
                 </div>
             `;

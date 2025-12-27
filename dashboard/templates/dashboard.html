@@ -21,14 +21,8 @@
             port: {{ ssh_info.port }}
         };
     </script>
-    <div class="ssh-info">
-        <h2>Server Info</h2>
-        <p>Hostname: {{ ssh_info.hostname }}</p>
-        <p>Username: {{ ssh_info.username }}</p>
-        <p>Port: {{ ssh_info.port }}</p>
-    </div>
+    <p>{{ ssh_info.username }}@{{ ssh_info.hostname }}:{{ ssh_info.port }}</p>  
     <div class='server-info'>
-        <h2>System Metrics</h2>
         <div class='metric'>
             <i class="fa-solid fa-microchip"></i>
             <p id='cpu'>CPU: Loading...</p>
@@ -43,7 +37,6 @@
         </div>
     </div>
     <div class='file-directory'>
-        <h2>File Directory</h2>
         <div id='file-display'></div>
     </div>
 {% else %}

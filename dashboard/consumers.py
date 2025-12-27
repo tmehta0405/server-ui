@@ -3,6 +3,7 @@ import asyncio
 import re
 import asyncssh
 from channels.generic.websocket import AsyncWebsocketConsumer
+import os
 
 class Consumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -16,13 +17,244 @@ class Consumer(AsyncWebsocketConsumer):
         print(f"Received: {text_data}")
         try:
             data = json.loads(text_data)
-            if data.get('action') == 'start':
-                ssh_data = data.get('ssh_data', {})
+            action = data.get('action')
+            ssh_data = data.get('ssh_data', {})
+            
+            if action == 'start':
                 print(f"Starting monitor with SSH data: {ssh_data}")
                 asyncio.create_task(self.monitor(ssh_data))
+            elif action == 'list_directory':
+                path = data.get('path', '~')
+                await self.list_directory(ssh_data, path)
+            elif action == 'read_file':
+                filepath = data.get('filepath')
+                await self.read_file(ssh_data, filepath)
+            elif action == 'write_file':
+                filepath = data.get('filepath')
+                content = data.get('content', '')
+                await self.write_file(ssh_data, filepath, content)
+            elif action == 'create_file':
+                filepath = data.get('filepath')
+                await self.create_file(ssh_data, filepath)
+            elif action == 'create_folder':
+                folderpath = data.get('folderpath')
+                await self.create_folder(ssh_data, folderpath)
+            elif action == 'delete_file':
+                filepath = data.get('filepath')
+                await self.delete_file(ssh_data, filepath)
+            elif action == 'rename':
+                old_path = data.get('old_path')
+                new_path = data.get('new_path')
+                await self.rename_file(ssh_data, old_path, new_path)
         except Exception as e:
             print(f"Receive error: {e}")
             await self.send(text_data=json.dumps({'status': 'error', 'message': str(e)}))
+
+    async def list_directory(self, ssh_data, path):
+        try:
+            async with asyncssh.connect(
+                ssh_data.get('host'),
+                port=int(ssh_data.get('port', 22)),
+                username=ssh_data.get('user'),
+                password=ssh_data.get('password'),
+                known_hosts=None,
+                connect_timeout=10
+            ) as conn:
+                if path == '~':
+                    expand_cmd = f'ls -l ~'
+                    real_path = '~'
+                else:
+                    expand_cmd = f'ls -l "{path}"'
+                    real_path = path
+                
+                result = await conn.run(expand_cmd, timeout=5)
+                output = result.stdout.strip()
+                
+                items = []
+                for line in output.split('\n')[1:]: 
+                    if not line.strip():
+                        continue
+                    
+                    parts = line.split()
+                    if len(parts) >= 9:
+                        permissions = parts[0]
+                        size = parts[4]
+                        name = ' '.join(parts[8:])
+                        item_type = 'directory' if permissions[0] == 'd' else 'file'
+                        
+                        items.append({
+                            'name': name,
+                            'type': item_type,
+                            'size': size,
+                            'permissions': permissions
+                        })
+                
+                await self.send(text_data=json.dumps({
+                    'action': 'directory_list',
+                    'status': 'success',
+                    'path': real_path,
+                    'items': items
+                }))
+        except Exception as e:
+            print(f"List directory error: {e}")
+            await self.send(text_data=json.dumps({
+                'action': 'directory_list',
+                'status': 'error',
+                'message': str(e)
+            }))
+
+    async def read_file(self, ssh_data, filepath):
+        try:
+            async with asyncssh.connect(
+                ssh_data.get('host'),
+                port=int(ssh_data.get('port', 22)),
+                username=ssh_data.get('user'),
+                password=ssh_data.get('password'),
+                known_hosts=None,
+                connect_timeout=10
+            ) as conn:
+                result = await conn.run(f'cat "{filepath}"', timeout=5)
+                content = result.stdout
+                
+                await self.send(text_data=json.dumps({
+                    'action': 'file_content',
+                    'status': 'success',
+                    'filepath': filepath,
+                    'content': content
+                }))
+        except Exception as e:
+            print(f"Read file error: {e}")
+            await self.send(text_data=json.dumps({
+                'action': 'file_content',
+                'status': 'error',
+                'message': str(e)
+            }))
+
+    async def write_file(self, ssh_data, filepath, content):
+        try:
+            async with asyncssh.connect(
+                ssh_data.get('host'),
+                port=int(ssh_data.get('port', 22)),
+                username=ssh_data.get('user'),
+                password=ssh_data.get('password'),
+                known_hosts=None,
+                connect_timeout=10
+            ) as conn:
+                result = await conn.run(f'cat > "{filepath}"', input=content.encode(), timeout=5)
+                
+                await self.send(text_data=json.dumps({
+                    'action': 'file_written',
+                    'status': 'success',
+                    'filepath': filepath
+                }))
+        except Exception as e:
+            print(f"Write file error: {e}")
+            await self.send(text_data=json.dumps({
+                'action': 'file_written',
+                'status': 'error',
+                'message': str(e)
+            }))
+
+    async def create_file(self, ssh_data, filepath):
+        try:
+            async with asyncssh.connect(
+                ssh_data.get('host'),
+                port=int(ssh_data.get('port', 22)),
+                username=ssh_data.get('user'),
+                password=ssh_data.get('password'),
+                known_hosts=None,
+                connect_timeout=10
+            ) as conn:
+                await conn.run(f'touch "{filepath}"', timeout=5)
+                
+                await self.send(text_data=json.dumps({
+                    'action': 'file_created',
+                    'status': 'success',
+                    'filepath': filepath
+                }))
+        except Exception as e:
+            print(f"Create file error: {e}")
+            await self.send(text_data=json.dumps({
+                'action': 'file_created',
+                'status': 'error',
+                'message': str(e)
+            }))
+
+    async def create_folder(self, ssh_data, folderpath):
+        try:
+            async with asyncssh.connect(
+                ssh_data.get('host'),
+                port=int(ssh_data.get('port', 22)),
+                username=ssh_data.get('user'),
+                password=ssh_data.get('password'),
+                known_hosts=None,
+                connect_timeout=10
+            ) as conn:
+                await conn.run(f'mkdir -p "{folderpath}"', timeout=5)
+                
+                await self.send(text_data=json.dumps({
+                    'action': 'folder_created',
+                    'status': 'success',
+                    'folderpath': folderpath
+                }))
+        except Exception as e:
+            print(f"Create folder error: {e}")
+            await self.send(text_data=json.dumps({
+                'action': 'folder_created',
+                'status': 'error',
+                'message': str(e)
+            }))
+
+    async def delete_file(self, ssh_data, filepath):
+        try:
+            async with asyncssh.connect(
+                ssh_data.get('host'),
+                port=int(ssh_data.get('port', 22)),
+                username=ssh_data.get('user'),
+                password=ssh_data.get('password'),
+                known_hosts=None,
+                connect_timeout=10
+            ) as conn:
+                await conn.run(f'rm -rf "{filepath}"', timeout=5)
+                
+                await self.send(text_data=json.dumps({
+                    'action': 'file_deleted',
+                    'status': 'success',
+                    'filepath': filepath
+                }))
+        except Exception as e:
+            print(f"Delete file error: {e}")
+            await self.send(text_data=json.dumps({
+                'action': 'file_deleted',
+                'status': 'error',
+                'message': str(e)
+            }))
+
+    async def rename_file(self, ssh_data, old_path, new_path):
+        try:
+            async with asyncssh.connect(
+                ssh_data.get('host'),
+                port=int(ssh_data.get('port', 22)),
+                username=ssh_data.get('user'),
+                password=ssh_data.get('password'),
+                known_hosts=None,
+                connect_timeout=10
+            ) as conn:
+                await conn.run(f'mv "{old_path}" "{new_path}"', timeout=5)
+                
+                await self.send(text_data=json.dumps({
+                    'action': 'item_renamed',
+                    'status': 'success',
+                    'old_path': old_path,
+                    'new_path': new_path
+                }))
+        except Exception as e:
+            print(f"Rename file error: {e}")
+            await self.send(text_data=json.dumps({
+                'action': 'item_renamed',
+                'status': 'error',
+                'message': str(e)
+            }))
 
     async def files(self, ssh_data):
         try:

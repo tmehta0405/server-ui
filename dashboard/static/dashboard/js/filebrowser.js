@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fileList.innerHTML = '';
             
             if (items.length === 0) {
-                fileList.innerHTML = '<div class="empty-message">📭 Empty directory</div>';
+                fileList.innerHTML = '<div class="empty-message">Empty directory</div>';
                 return;
             }
             
@@ -225,16 +225,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 itemDiv.dataset.type = item.type;
                 
                 const icon = this.getFileIcon(item);
-                const sizeDisplay = item.type === 'directory' ? '<span class="file-type">Folder</span>' : `<span class="file-size">${this.formatSize(item.size)}</span>`;
+                const sizeDisplay = item.type === 'directory' ? '' : `<span class="file-size">${this.formatSize(item.size)}</span>`;
                 
-                itemDiv.innerHTML = `
-                    <div class="file-icon">${icon}</div>
-                    <div class="file-info">
+                itemDiv.innerHTML = ` 
+                    <div class="h-align">
+                        <div class="file-icon">${icon}</div>
                         <div class="file-name">${this.escapeHtml(item.name)}</div>
                         ${sizeDisplay}
                     </div>
-                    <div class="file-permissions">${item.permissions}</div>
-                `;
+                `; //gotta change ts later
                 
                 itemDiv.addEventListener('dblclick', () => {
                     if (item.type === 'directory') {
@@ -244,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
                 
-                itemDiv.addEventListener('click', (e) => {
+                itemDiv.addEventListener('click', () => {
                     document.querySelectorAll('.file-item').forEach(el => el.classList.remove('selected'));
                     itemDiv.classList.add('selected');
                     this.selectedItem = item;
@@ -264,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         getFileIcon(item) {
             if (item.type === 'directory') {
-                return '📁';
+                return '<i class="fa-solid fa-folder"></i>';
             }
             
             return ''; 

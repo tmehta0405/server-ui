@@ -64,7 +64,7 @@ class Consumer(AsyncWebsocketConsumer):
                     expand_cmd = f'ls -l ~'
                     real_path = '~'
                 else:
-                    expand_cmd = f'ls -l "{path}"'
+                    expand_cmd = f'ls -l {path}'
                     real_path = path
                 
                 result = await conn.run(expand_cmd, timeout=5)
@@ -285,7 +285,6 @@ class Consumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({'status': 'error', 'message': f"SSH error: {str(e)}"}))
     async def monitor(self, ssh_data):
         try:
-            print(f"Connecting to {ssh_data.get('host')}:{ssh_data.get('port')}")
             async with asyncssh.connect(
                 ssh_data.get('host'),
                 port=int(ssh_data.get('port', 22)),
@@ -294,7 +293,6 @@ class Consumer(AsyncWebsocketConsumer):
                 known_hosts=None,
                 connect_timeout=10
             ) as conn:
-                print("SSH connected")
                 while True:  
                     try:
                         result = await conn.run(
@@ -308,7 +306,6 @@ class Consumer(AsyncWebsocketConsumer):
                         )
                         output_raw = result.stdout
                         output = output_raw.decode('utf-8') if isinstance(output_raw, bytes) else str(output_raw)
-                        print(f"Command output: {output}")
                         data = {}
                         lines = output.strip().split('\n')
 
@@ -324,7 +321,6 @@ class Consumer(AsyncWebsocketConsumer):
                                         break
                                 break
                         
-                        print(f"Sending Data: {data}")
                         await self.send(text_data=json.dumps({
                             'status': 'success', #data.status in js 
                             'cpu': data.get('cpu', 'N/A'),

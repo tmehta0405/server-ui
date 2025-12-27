@@ -63,12 +63,12 @@ document.addEventListener('DOMContentLoaded', function() {
             this.container.innerHTML = `
                 <div class="file-browser">
                     <div class="file-browser-toolbar">
-                        <button id="btn-back" class="btn-icon" title="Back">Back</button>
-                        <button id="btn-home" class="btn-icon" title="Home">Home</button>
-                        <button id="btn-refresh" class="btn-icon" title="Refresh">Refresh</button>
+                        <button id="btn-back" class="btn-icon btn" title="Back">Back</button>
+                        <button id="btn-home" class="btn-icon btn " title="Home">Home</button>
+                        <button id="btn-refresh" class="btn-icon btn" title="Refresh">Refresh</button>
                         <div class="path-display" id="path-display">~</div>
-                        <button id="btn-new-file" class="btn-primary">+ File</button>
-                        <button id="btn-new-folder" class="btn-primary">+ Folder</button>
+                        <button id="btn-new-file" class="btn-primary btn">+ File</button>
+                        <button id="btn-new-folder" class="btn-primary btn">+ Folder</button>
                     </div>
                     
                     <div class="file-list-container">
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span id="editor-filename" class="editor-filename">File</span>
                             <div class="editor-actions">
                                 <button id="btn-save" class="btn-success">Save</button>
-                                <button id="btn-close-editor" class="btn-secondary">✖ Close</button>
+                                <button id="btn-close-editor" class="btn-secondary">Close</button>
                             </div>
                         </div>
                         <textarea id="editor-content" class="editor-textarea" spellcheck="false"></textarea>
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="file-name">${this.escapeHtml(item.name)}</div>
                         ${sizeDisplay}
                     </div>
-                `; //gotta change ts later
+                `; 
                 
                 itemDiv.addEventListener('dblclick', () => {
                     if (item.type === 'directory') {

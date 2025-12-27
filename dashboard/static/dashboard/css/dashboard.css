@@ -26,3 +26,12 @@ h2 {
     gap: 5px;
     flex-direction: row;
 }
+
+.metric i {
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn {
+    border: none;
+}

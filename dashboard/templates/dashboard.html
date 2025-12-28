@@ -21,7 +21,11 @@
             port: {{ ssh_info.port }}
         };
     </script>
-    <p>{{ ssh_info.username }}@{{ ssh_info.hostname }}:{{ ssh_info.port }}</p>  
+    {%if ssh_info.port == 22%}
+        <p>{{ ssh_info.username }}@{{ ssh_info.hostname }}</p>
+    {%else%}
+        <p>{{ ssh_info.username }}@{{ ssh_info.hostname }}:{{ ssh_info.port }}</p>
+    {%endif%}
     <div class='server-info'>
         <div class='metric'>
             <i class="fa-solid fa-microchip"></i>

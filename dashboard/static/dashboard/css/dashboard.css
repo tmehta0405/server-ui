@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 body {
-    font-family: 'Fredoka';
+    font-family: 'Jetbrains Mono';
     background-color: #070707;
     color: #fafafa;
     font-weight: 400;
@@ -19,6 +20,7 @@ h2 {
     display: flex;
     gap: 5px;
     flex-direction: row;
+    cursor: pointer;
 }
 
 .metric {
@@ -36,6 +38,7 @@ h2 {
     border: none;
     background: transparent;
     color: #fafafa;
+    cursor: pointer;
 }
 
 .upload-section {
